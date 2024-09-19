@@ -18,6 +18,22 @@
         <div>{{ weaponDPS.total }}</div>
       </div>
     </div>
+    <div v-if="item.disenchantCandidates" :class="$style.itemInfo">
+      <div class="grid grid-cols-2 gap-2 overflow-auto pb-4 px-4">
+        <div v-for="uniqueItemDisenchanting in item.disenchantCandidates" class="flex">
+          <div class="bg-gray-700 rounded flex gap-x-3 items-center p-2 w-full">
+            <img :src="uniqueItemDisenchanting.icon" class="w-12" />
+            <div class="leading-tight text-left">
+              <div>{{ uniqueItemDisenchanting.name }}</div>
+              <div>
+                <img src="/images/dust.png" class="w-5" style="float: left" />
+                <span style="padding-left: 2px;">{{ uniqueItemDisenchanting.value }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

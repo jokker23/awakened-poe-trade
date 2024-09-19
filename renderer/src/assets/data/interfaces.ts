@@ -1,5 +1,11 @@
 import type { ItemCategory } from '@/parser'
 
+export interface DisenchantUniqueItem {
+  name: string
+  baseType: string
+  dustAmount: number
+}
+
 export interface StatMatcher {
   string: string
   advanced?: string
