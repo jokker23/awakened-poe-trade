@@ -123,7 +123,7 @@ export interface StatFilter {
   disabled: boolean // NOTE: mutable in UI
 }
 
-export const INTERNAL_TRADE_IDS = [
+const _INTERNAL_TRADE_IDS = [
   'item.base_percentile',
   'item.memory_strands',
   'item.armour',
@@ -142,7 +142,8 @@ export const INTERNAL_TRADE_IDS = [
   'item.map_pack_size'
 ] as const
 
-export type InternalTradeId = typeof INTERNAL_TRADE_IDS[number]
+export type InternalTradeId = typeof _INTERNAL_TRADE_IDS[number]
+export const INTERNAL_TRADE_IDS = _INTERNAL_TRADE_IDS as readonly string[]
 
 export enum ItemHasEmptyModifier {
   Any = 0,

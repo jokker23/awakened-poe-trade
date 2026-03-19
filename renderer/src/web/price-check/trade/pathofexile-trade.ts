@@ -496,7 +496,7 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[]) {
 
   type BareStatFilter = Omit<StatFilter, 'statRef' | 'text' | 'tag' | 'sources'>
   const realStats: BareStatFilter[] = stats.filter(stat =>
-    !INTERNAL_TRADE_IDS.includes(stat.tradeId[0] as any))
+    !INTERNAL_TRADE_IDS.includes(stat.tradeId[0]))
   if (filters.veiled) {
     for (const statRef of filters.veiled.statRefs) {
       const statOrGroup = STAT_BY_REF_V2(statRef)!
