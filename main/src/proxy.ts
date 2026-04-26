@@ -43,12 +43,17 @@ export class HttpProxy {
         const resHeaders = { ...proxyRes.headers }
         // `net.request` returns an already decoded body
         delete resHeaders['content-encoding']
-        if (resHeaders['x-rate-limit-rules']) {
+        const status = proxyRes.statusCode
+        const isInteresting = status !== 200 || resHeaders['x-rate-limit-rules']
+        if (isInteresting) {
           const rlDump = Object.entries(resHeaders)
             .filter(([k]) => k.startsWith('x-rate-limit-') && k !== 'x-rate-limit-rules' && k !== 'x-rate-limit-policy')
             .map(([k, v]) => `${k.replace('x-rate-limit-', '')}=${v}`)
             .join(' ')
-          logger.write(`[rl] ${proxyRes.statusCode} ${req.url} ${rlDump}`)
+          const retry = resHeaders['retry-after'] ? ` retry-after=${resHeaders['retry-after']}` : ''
+          const via = resHeaders['server'] || resHeaders['x-served-by'] || ''
+          const viaTag = via ? ` server=${via}` : ''
+          logger.write(`[rl] ${status} ${req.url}${retry}${viaTag} ${rlDump}`.trimEnd())
         }
         res.writeHead(proxyRes.statusCode, proxyRes.statusMessage, resHeaders)
         ;(proxyRes as unknown as NodeJS.ReadableStream).pipe(res)
