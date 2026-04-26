@@ -125,16 +125,9 @@ function _adjustRateLimits (clientLimits: Set<RateLimiter>, limitStr: string, st
   /* eslint-enable */
 }
 
-export function preventQueueCreation (targets: Array<{ count: number, limiters: Iterable<RateLimiter> }>) {
-  const estimatedMillis = Math.max(...targets.map(target => {
-    const estimated = RateLimiter.estimateTime(target.count, target.limiters)
-    const estimatedCleanState = RateLimiter.estimateTime(target.count, target.limiters, true)
-
-    // ignore if impossible to run without queue
-    return (estimated === estimatedCleanState) ? 0 : estimated
-  }))
-
-  if (estimatedMillis >= 1500) {
-    throw new Error(`Retry after ${Math.round(estimatedMillis / 1000)} seconds`)
-  }
+export function preventQueueCreation (_targets: Array<{ count: number, limiters: Iterable<RateLimiter> }>) {
+  // no-op: skip the pre-flight queue-time estimator that throws
+  // "Retry after Ns". Requests still go through RateLimiter.waitMulti
+  // and adjustRateLimits, so we still respect the actual server-reported
+  // rate limits — we just queue silently instead of erroring upfront.
 }
