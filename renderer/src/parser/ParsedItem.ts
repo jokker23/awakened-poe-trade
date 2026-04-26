@@ -88,6 +88,7 @@ export interface ParsedItem {
   disenchantCandidates: Array<{
     name: string
     value: string
+    gold: string
     icon: string
   }>
   rawText: string

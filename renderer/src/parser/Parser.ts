@@ -14,7 +14,7 @@ import { IncursionRoom, ParsedItem, ItemInfluence, ItemRarity } from './ParsedIt
 import { magicBasetype } from './magic-name'
 import { isModInfoLine, groupLinesByMod, parseModInfoLine, parseModType, ModifierInfo, ParsedModifier, ENCHANT_LINE, SCOURGE_LINE, IMPLICIT_LINE } from './advanced-mod-desc'
 import { calcPropPercentile, QUALITY_STATS } from './calc-q20'
-import { ITEMS_ITERATOR, DISENCHANT_UNIQUE_ITEMS_ITERATOR, CLIENT_STRINGS } from '@/assets/data'
+import { ITEMS_ITERATOR, DISENCHANT_UNIQUE_ITEMS_ITERATOR } from '@/assets/data'
 
 type SectionParseResult =
   | 'SECTION_PARSED'
@@ -778,49 +778,19 @@ function parseDisenchantCandidates(item: ParserState) {
     possibleItems.push({ name: item.info.name, refName: refName, icon: item.info.icon })
   }
 
-  const items: {name: string, value: string, icon: string}[] = []
-  const ilvl = item.itemLevel || 0
-  // 50% increased Thaumaturgic Dust per Influence Type
-  let increaseByFactors = item.influences.length * 50
-
-  // Increased Thaumaturgic Dust per Item Quality
-  if (item.quality) {
-    increaseByFactors += item.quality * 2
-  } else {
-    // Checking the catalyst quality
-    const catalystQualityStr = CLIENT_STRINGS.QUALITY.slice(0, -2) + ' ('
-    const lines = item.rawText.split(/\r?\n/)
-
-    for (const line of lines) {
-      if (line.startsWith(catalystQualityStr)) {
-        // "Quality (Elemental Damage Modifiers): +20% (augmented)"
-        increaseByFactors += parseInt(line.match(/\d+/)?.join('') || '0', 10)
-        break
-      }
-    }
-  }
-
-  if (item.isCorrupted) {
-    for (const mod of item.newMods) {
-      // 50% increased Thaumaturgic Dust per Corruption Implicit
-      if (mod.info.generation === 'corrupted') {
-        increaseByFactors += 50
-      }
-    }
-  }
-
-  // Per Influence + Corrupt + Quality
-  const factorsMultiplier = (increaseByFactors + 100) / 100
-  const term1 = 50 // ilvl 46 and below
-  const term2 = 2 * (Math.min(Math.max(ilvl, 46), 68) - 46) // ilvl 47 to 68
-  const term3 = Math.floor(3 * (Math.min(Math.max(ilvl, 46), 68) - 46) / 11) // ilvl 47 to 68
-  const term4 = 25 * (Math.min(Math.max(ilvl, 68), 84) - 68) // ilvl 69 to 84
-  const globalMultiplier = 5 * (term1 + term2 + term3 + term4) * factorsMultiplier
+  const items: {name: string, value: string, gold: string, icon: string}[] = []
+  const isQ20 = (item.quality ?? 0) >= 20
 
   for (const entry of possibleItems) {
     for (const match of DISENCHANT_UNIQUE_ITEMS_ITERATOR(JSON.stringify(entry.refName))) {
       if (match.name === entry.refName) {
-        items.push({ name: entry.name, value: Math.floor(match.dustAmount * globalMultiplier).toLocaleString('en-us'), icon: entry.icon })
+        const dust = isQ20 ? match.dustValIlvl84Q20 : match.dustValIlvl84
+        items.push({
+          name: entry.name,
+          value: dust.toLocaleString('en-us'),
+          gold: match.goldCost.toLocaleString('en-us'),
+          icon: entry.icon
+        })
       }
     }
   }

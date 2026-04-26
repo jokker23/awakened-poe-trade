@@ -3,7 +3,10 @@ import type { ItemCategory } from '@/parser'
 export interface DisenchantUniqueItem {
   name: string
   baseType: string
-  dustAmount: number
+  dustValIlvl84: number
+  dustValIlvl84Q20: number
+  goldCost: number
+  slots: number
 }
 
 export interface StatMatcher {
