@@ -61,11 +61,18 @@ export function createExactStatFilters (
     keepByType.push(ModifierType.Crafted)
   }
 
+  const isUniqueJewel = item.rarity === ItemRarity.Unique && (
+    item.category === ItemCategory.Jewel ||
+    item.category === ItemCategory.AbyssJewel
+  )
+
   const ctx: FiltersCreationContext = {
     item,
-    searchInRange: (item.category !== ItemCategory.Map)
-      ? Math.min(2, opts.searchStatRange)
-      : opts.searchStatRange,
+    searchInRange: isUniqueJewel
+      ? 0
+      : (item.category !== ItemCategory.Map)
+          ? Math.min(2, opts.searchStatRange)
+          : opts.searchStatRange,
     filters: [],
     statsByType: statsByType.filter(calc => keepByType.includes(calc.type))
   }
@@ -144,10 +151,17 @@ export function initUiModFilters (
     searchStatRange: number
   }
 ): StatFilter[] {
+  const isUniqueJewel = item.rarity === ItemRarity.Unique && (
+    item.category === ItemCategory.Jewel ||
+    item.category === ItemCategory.AbyssJewel
+  )
+
   const ctx: FiltersCreationContext = {
     item,
     filters: [],
-    searchInRange: (item.rarity === ItemRarity.Normal) ? 100 : opts.searchStatRange,
+    searchInRange: isUniqueJewel
+      ? 0
+      : (item.rarity === ItemRarity.Normal) ? 100 : opts.searchStatRange,
     statsByType: item.statsByType.map(calc => {
       if (calc.type === ModifierType.Fractured && calc.stat.trade.ids[ModifierType.Explicit]) {
         return { ...calc, type: ModifierType.Explicit }
