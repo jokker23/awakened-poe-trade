@@ -356,6 +356,15 @@ export function calculatedStatToFilter (
 
     filterFillMinMax(filter.roll, calc.stat.better)
 
+    const isUniqueJewel = item.rarity === ItemRarity.Unique && (
+      item.category === ItemCategory.Jewel ||
+      item.category === ItemCategory.AbyssJewel
+    )
+    if (isUniqueJewel) {
+      filter.roll.min = filter.roll.default.min
+      filter.roll.max = filter.roll.default.max
+    }
+
     if (translation.negate) {
       filterAdjustmentForNegate(filter.roll)
     }
