@@ -35,15 +35,9 @@ export function tradeTag (item: ParsedItem): string | undefined {
 }
 
 export const RATE_LIMIT_RULES = {
-  SEARCH: shallowReactive(new Set([
-    new RateLimiter(1, 5)
-  ])),
-  EXCHANGE: shallowReactive(new Set([
-    new RateLimiter(1, 5)
-  ])),
-  FETCH: shallowReactive(new Set([
-    new RateLimiter(1, 5)
-  ]))
+  SEARCH: shallowReactive(new Set<RateLimiter>()),
+  EXCHANGE: shallowReactive(new Set<RateLimiter>()),
+  FETCH: shallowReactive(new Set<RateLimiter>())
 }
 
 export function adjustRateLimits (clientLimits: Set<RateLimiter>, headers: Headers): void {
