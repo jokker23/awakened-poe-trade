@@ -88,14 +88,9 @@ function _adjustRateLimits (clientLimits: Set<RateLimiter>, limitStr: string, st
 
     if (delta === 0) {
       DEBUG && console.log('Limits are in sync')
-    } else if (delta > 0) {
-      DEBUG && console.error(`Rate limit state on Server is greater by ${Math.abs(delta)}. Bursting to prevent rate limiting.`)
-      for (let i = 0; i < Math.min(delta, limit.available); ++i) {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        limit.wait()
-      }
-    } else if (delta < 0) {
-      DEBUG && console.warn(`Rate limit state on Client is greater by ${Math.abs(delta)}`)
+    } else {
+      DEBUG && console.warn(`Rate limit state differs by ${delta}, following server.`)
+      limit.syncToServerState(serverLimit.state)
     }
   }
 
@@ -110,10 +105,7 @@ function _adjustRateLimits (clientLimits: Set<RateLimiter>, limitStr: string, st
     clientLimits.add(rl)
     DEBUG && console.log('Add', rl.toString())
 
-    for (let i = 0; i < serverLimit.state; ++i) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      rl.wait()
-    }
+    rl.syncToServerState(serverLimit.state)
   }
 
   /* eslint-enable */

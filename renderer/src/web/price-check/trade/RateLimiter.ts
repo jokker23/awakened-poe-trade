@@ -44,6 +44,23 @@ export class RateLimiter {
     this.stack.push(handle)
   }
 
+  // Make the local count mirror the state reported by the server headers,
+  // in both directions. Releasing early matters when requests leave through
+  // rotating exit IPs, where the local count is the sum across all of them
+  // while each response only reports the state of the IP it came from.
+  syncToServerState (state: number) {
+    while (this.stack.length > state) {
+      const handle = this.stack[0]
+      handle.release()
+      if (this.stack[0] === handle) {
+        this.stack.shift()
+      }
+    }
+    for (let i = this.stack.length; i < Math.min(state, this.max); ++i) {
+      this.push()
+    }
+  }
+
   static async waitMulti (limiters: Iterable<RateLimiter>): Promise<void> {
     const _limiters = Array.from(limiters)
 
@@ -161,5 +178,12 @@ class ResourceHandle {
     clearTimeout(this._tmid)
     this._cb()
     this._reject(reason)
+  }
+
+  // same as expiring naturally, just ahead of the timer
+  public release () {
+    clearTimeout(this._tmid)
+    this._cb()
+    this._resolve()
   }
 }
