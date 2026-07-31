@@ -71,6 +71,17 @@ function _adjustRateLimits (clientLimits: Set<RateLimiter>, limitStr: string, st
       state: limitRuleState[idx]
     }))
 
+  // a malformed header tells us nothing about the server's state, and acting on
+  // it would destroy live limiters or seed bogus ones. leave everything as-is.
+  if (limitRule.some(rule =>
+    !Number.isFinite(rule.max) ||
+    !Number.isFinite(rule.window) ||
+    !Number.isFinite(rule.state))
+  ) {
+    DEBUG && console.warn('Ignoring malformed rate limit headers', limitStr, stateStr)
+    return
+  }
+
   // destroy
   for (const limit of clientLimits) {
     const isActive = limitRule.some(serverLimit => limit.isEqualLimit(serverLimit))

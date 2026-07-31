@@ -49,14 +49,17 @@ export class RateLimiter {
   // rotating exit IPs, where the local count is the sum across all of them
   // while each response only reports the state of the IP it came from.
   syncToServerState (state: number) {
-    while (this.stack.length > state) {
+    if (!Number.isFinite(state)) return
+    const target = Math.max(0, Math.min(state, this.max))
+
+    while (this.stack.length > target) {
       const handle = this.stack[0]
       handle.release()
       if (this.stack[0] === handle) {
         this.stack.shift()
       }
     }
-    for (let i = this.stack.length; i < Math.min(state, this.max); ++i) {
+    for (let i = this.stack.length; i < target; ++i) {
       this.push()
     }
   }
