@@ -196,6 +196,17 @@ export default defineComponent({
       }
     })
 
+    // Mercenary Warrants do not carry their skill list in the copied text,
+    // so it is read off the tooltip on a separate hotkey and folded into the
+    // item already being checked.
+    Host.onEvent('MAIN->CLIENT::ocr-text', (e) => {
+      if (e.target !== 'mercenary-skills') return
+      if (!item.value?.isOk()) return
+      const checked = item.value.value
+      if (!checked.info.tradeDisc) return
+      item.value = ok({ ...checked, mercenarySkills: e.paragraphs })
+    })
+
     function handleIdentification (identified: ParsedItem) {
       item.value = ok(identified)
     }

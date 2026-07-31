@@ -174,17 +174,21 @@ export class Shortcuts {
             (entry.keepModKeys) ? entry.shortcut.split(' + ').filter(key => isModKey(key)) : undefined,
             this.gameConfig.showModsKey
           )
-        } else if (entry.action.type === 'ocr-text' && entry.action.target === 'heist-gems') {
+        } else if (entry.action.type === 'ocr-text') {
           if (process.platform !== 'win32') return
 
           const { action } = entry
           const pressTime = Date.now()
           const imageData = this.poeWindow.screenshot()
-          this.ocrWorker.findHeistGems({
+          const screenshot = {
             width: this.poeWindow.bounds.width,
             height: this.poeWindow.bounds.height,
             data: imageData
-          }).then(result => {
+          }
+          const ocr = (action.target === 'mercenary-skills')
+            ? this.ocrWorker.findMercenarySkills(screenshot)
+            : this.ocrWorker.findHeistGems(screenshot)
+          ocr.then(result => {
             this.server.sendEventTo('last-active', {
               name: 'MAIN->CLIENT::ocr-text',
               payload: {

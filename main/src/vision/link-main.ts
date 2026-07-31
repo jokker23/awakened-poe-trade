@@ -39,4 +39,10 @@ export class OcrWorker {
       Comlink.transfer(image, [image.data.buffer]))
     return result
   }
+
+  async findMercenarySkills (image: ImageData) {
+    const result = await this.api.findMercenarySkills(
+      Comlink.transfer(image, [image.data.buffer]))
+    return result
+  }
 }
