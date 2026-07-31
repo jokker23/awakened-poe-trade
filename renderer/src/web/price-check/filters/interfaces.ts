@@ -23,6 +23,9 @@ export interface ItemFilters {
     value?: string
     trade: string
   }
+  mercenarySkills?: {
+    value: Array<{ id: string, name: string, disabled: boolean }>
+  }
   rarity?: {
     value: string
     disabled: boolean

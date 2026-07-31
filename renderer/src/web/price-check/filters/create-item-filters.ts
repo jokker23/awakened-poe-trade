@@ -5,6 +5,7 @@ import { tradeTag } from '../trade/common'
 import { ModifierType } from '@/parser/modifiers'
 import { BaseType, ITEM_BY_REF, ITEM_BY_TRANSLATED } from '@/assets/data'
 import { CATEGORY_TO_TRADE_ID } from '../trade/pathofexile-trade'
+import { matchMercenarySkills } from './mercenary-skills'
 
 export const SPECIAL_SUPPORT_GEM = ['Empower Support', 'Enlighten Support', 'Enhance Support']
 
@@ -194,6 +195,14 @@ export function createFilters (
     }
     if (item.info.tradeDisc) {
       filters.discriminator = { trade: item.info.tradeDisc }
+    }
+    if (item.mercenarySkills?.length) {
+      const matched = matchMercenarySkills(item.mercenarySkills)
+      if (matched.length) {
+        filters.mercenarySkills = {
+          value: matched.map(skill => ({ ...skill, disabled: false }))
+        }
+      }
     }
     if (item.category && CATEGORY_TO_TRADE_ID.has(item.category)) {
       let disabled = opts.exact
