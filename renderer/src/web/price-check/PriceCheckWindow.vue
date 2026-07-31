@@ -103,6 +103,7 @@ export default defineComponent({
         wmFlags: ['hide-on-blur', 'menu::skip'],
         showRateLimitState: false,
         apiLatencySeconds: 2,
+        ocrMercenaryKey: null,
         collapseListings: 'api',
         smartInitialSearch: true,
         lockedInitialSearch: true,

@@ -43,6 +43,7 @@ export interface PriceCheckWidget extends Widget {
   searchStatRange: number
   showRateLimitState: boolean
   apiLatencySeconds: number
+  ocrMercenaryKey: string | null
   collapseListings: 'api' | 'app'
   smartInitialSearch: boolean
   lockedInitialSearch: boolean
