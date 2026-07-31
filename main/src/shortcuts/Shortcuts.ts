@@ -29,7 +29,7 @@ export class Shortcuts {
     gameConfig: GameConfig,
     server: ServerEvents
   ) {
-    const ocrWorker = await OcrWorker.create()
+    const ocrWorker = await OcrWorker.create(logger)
     const shortcuts = new Shortcuts(logger, overlay, poeWindow, gameConfig, server, ocrWorker)
     return shortcuts
   }
@@ -185,10 +185,16 @@ export class Shortcuts {
             height: this.poeWindow.bounds.height,
             data: imageData
           }
+          this.logger.write(`info [OCR] "${action.target}" triggered, ` +
+            `screen ${screenshot.width}x${screenshot.height}, engine ${this.ocrWorker.ready ? 'ready' : 'NOT LOADED'}`)
           const ocr = (action.target === 'mercenary-skills')
             ? this.ocrWorker.findMercenarySkills(screenshot)
             : this.ocrWorker.findHeistGems(screenshot)
           ocr.then(result => {
+            const seen = result.recognized
+              .map(p => `"${p.text}"(${Math.round(p.confidence)}%)`).join(' ')
+            this.logger.write(`info [OCR] "${action.target}" read ${result.recognized.length} lines ` +
+              `in ${Math.round(result.elapsed)}ms: ${seen || '<nothing>'}`)
             this.server.sendEventTo('last-active', {
               name: 'MAIN->CLIENT::ocr-text',
               payload: {
@@ -198,7 +204,9 @@ export class Shortcuts {
                 paragraphs: result.recognized.map(p => p.text)
               }
             })
-          }).catch(() => {})
+          }).catch((e) => {
+            this.logger.write(`error [OCR] "${action.target}" failed: ${(e as Error).message}`)
+          })
         }
       })
 
