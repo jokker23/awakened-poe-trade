@@ -80,6 +80,8 @@ export interface BaseType {
   tradeTag?: string
   exchangeable?: true
   tradeDisc?: string
+  // set when the trade site keys the item by an internal id instead of its name
+  tradeOption?: string
   disc?: {
     propAR?: true
     propEV?: true

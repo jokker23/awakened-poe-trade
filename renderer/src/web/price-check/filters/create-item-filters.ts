@@ -192,6 +192,9 @@ export function createFilters (
       baseType: item.info.name,
       baseTypeTrade: t(opts, item.info)
     }
+    if (item.info.tradeDisc) {
+      filters.discriminator = { trade: item.info.tradeDisc }
+    }
     if (item.category && CATEGORY_TO_TRADE_ID.has(item.category)) {
       let disabled = opts.exact
       if (
@@ -461,6 +464,7 @@ function createGemFilters (
 }
 
 function t (opts: CreateOptions, info: BaseType) {
+  if (info.tradeOption) return info.tradeOption
   return (opts.useEn) ? info.refName : info.name
 }
 
