@@ -1,6 +1,4 @@
-import { screen, globalShortcut, app } from 'electron'
-import fs from 'fs/promises'
-import path from 'path'
+import { screen, globalShortcut } from 'electron'
 import { uIOhook, UiohookKey, UiohookWheelEvent } from 'uiohook-napi'
 import { isModKey, KeyToElectron, mergeTwoHotkeys } from '../../../ipc/KeyToCode'
 import { typeInChat, stashSearch } from './text-box'
@@ -31,7 +29,7 @@ export class Shortcuts {
     gameConfig: GameConfig,
     server: ServerEvents
   ) {
-    const ocrWorker = await OcrWorker.create(logger)
+    const ocrWorker = await OcrWorker.create()
     const shortcuts = new Shortcuts(logger, overlay, poeWindow, gameConfig, server, ocrWorker)
     return shortcuts
   }
@@ -176,38 +174,17 @@ export class Shortcuts {
             (entry.keepModKeys) ? entry.shortcut.split(' + ').filter(key => isModKey(key)) : undefined,
             this.gameConfig.showModsKey
           )
-        } else if (entry.action.type === 'ocr-text') {
+        } else if (entry.action.type === 'ocr-text' && entry.action.target === 'heist-gems') {
           if (process.platform !== 'win32') return
 
           const { action } = entry
           const pressTime = Date.now()
           const imageData = this.poeWindow.screenshot()
-          const screenshot = {
+          this.ocrWorker.findHeistGems({
             width: this.poeWindow.bounds.width,
             height: this.poeWindow.bounds.height,
             data: imageData
-          }
-          this.logger.write(`info [OCR] "${action.target}" triggered, ` +
-            `screen ${screenshot.width}x${screenshot.height}, engine ${this.ocrWorker.ready ? 'ready' : 'NOT LOADED'}`)
-          if (action.target === 'mercenary-skills') {
-            // raw BGRA preceded by its dimensions, for offline inspection
-            const header = Buffer.alloc(8)
-            header.writeUInt32LE(screenshot.width, 0)
-            header.writeUInt32LE(screenshot.height, 4)
-            const dumpPath = path.join(app.getPath('userData'), 'ocr-dump.raw')
-            fs.writeFile(dumpPath, Buffer.concat([header, Buffer.from(imageData)]))
-              .then(() => { this.logger.write(`info [OCR] screenshot written to ${dumpPath}`) })
-              .catch((e) => { this.logger.write(`error [OCR] dump failed: ${(e as Error).message}`) })
-          }
-          const ocr = (action.target === 'mercenary-skills')
-            ? this.ocrWorker.findMercenarySkills(screenshot)
-            : this.ocrWorker.findHeistGems(screenshot)
-          ocr.then(result => {
-            const seen = result.recognized
-              .map(p => `"${p.text}"(${Math.round(p.confidence)}%)`).join(' ')
-            const candidates = ('candidates' in result) ? result.candidates : -1
-            this.logger.write(`info [OCR] "${action.target}" read ${result.recognized.length} lines ` +
-              `from ${candidates} candidates in ${Math.round(result.elapsed)}ms: ${seen || '<nothing>'}`)
+          }).then(result => {
             this.server.sendEventTo('last-active', {
               name: 'MAIN->CLIENT::ocr-text',
               payload: {
@@ -217,9 +194,7 @@ export class Shortcuts {
                 paragraphs: result.recognized.map(p => p.text)
               }
             })
-          }).catch((e) => {
-            this.logger.write(`error [OCR] "${action.target}" failed: ${(e as Error).message}`)
-          })
+          }).catch(() => {})
         }
       })
 

@@ -123,7 +123,7 @@ export interface Config {
 }
 
 export const defaultConfig = (): Config => ({
-  configVersion: 19,
+  configVersion: 18,
   overlayKey: 'Shift + Space',
   overlayBackground: 'rgba(129, 139, 149, 0.15)',
   overlayBackgroundClose: true,
@@ -432,13 +432,6 @@ function upgradeConfig (_config: Config): Config {
 
     config.configVersion = 18
   }
-
-  if (config.configVersion < 19) {
-    config.widgets.find(w => w.wmType === 'price-check')!
-      .ocrMercenaryKey = null
-
-    config.configVersion = 19
-  }
   /* eslint-enable */
 
   return config as unknown as Config
@@ -547,15 +540,6 @@ function getConfigForHost (): HostConfig {
             type: 'trigger-event',
             target: `stopwatch-reset:${widget.wmId}`
           }
-        })
-      }
-    } else if (widget.wmType === 'price-check') {
-      const priceCheckWidget = widget as widget.PriceCheckWidget
-      if (priceCheckWidget.ocrMercenaryKey) {
-        actions.push({
-          shortcut: priceCheckWidget.ocrMercenaryKey,
-          keepModKeys: true,
-          action: { type: 'ocr-text', target: 'mercenary-skills' }
         })
       }
     } else if (widget.wmType === 'item-search') {

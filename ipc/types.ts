@@ -19,7 +19,7 @@ export interface ShortcutAction {
     target: string
   } | {
     type: 'ocr-text'
-    target: 'heist-gems' | 'mercenary-skills'
+    target: 'heist-gems'
   } | {
     type: 'trigger-event'
     target: string

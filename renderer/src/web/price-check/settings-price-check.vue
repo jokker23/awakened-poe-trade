@@ -80,13 +80,6 @@
         </div>
       </div>
       <div class="mb-2 mx-2">
-        <div class="flex-1 mb-1">{{ t(':ocr_mercenary_key') }}</div>
-        <div class="flex mb-1">
-          <hotkey-input v-model="ocrMercenaryKey" class="w-48" />
-        </div>
-        <div class="mb-4 italic text-gray-500">{{ t(':ocr_mercenary_hint') }}</div>
-      </div>
-      <div class="mb-2 mx-2">
         <div class="flex-1 mb-1">{{ t(':extra_delay') }}</div>
         <div class="flex">
           <div class="flex mr-6">
@@ -109,11 +102,10 @@ import UiErrorBox from '@/web/ui/UiErrorBox.vue'
 import { configModelValue, configProp, findWidget } from '../settings/utils.js'
 import type { PriceCheckWidget } from '@/web/overlay/interfaces'
 import { useLeagues } from '../background/Leagues'
-import HotkeyInput from '@/web/settings/HotkeyInput.vue'
 
 export default defineComponent({
   name: 'price_check.name',
-  components: { UiRadio, UiCheckbox, UiToggle, UiErrorBox, HotkeyInput },
+  components: { UiRadio, UiCheckbox, UiToggle, UiErrorBox },
   props: configProp(),
   setup (props) {
     const configWidget = computed(() => findWidget<PriceCheckWidget>('price-check', props.config)!)
@@ -156,7 +148,6 @@ export default defineComponent({
           }
         }
       }),
-      ocrMercenaryKey: configModelValue(() => configWidget.value, 'ocrMercenaryKey'),
       apiLatencySeconds: computed<number>({
         get () {
           return configWidget.value.apiLatencySeconds

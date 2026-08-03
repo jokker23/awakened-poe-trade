@@ -342,8 +342,6 @@
     "fill_rolls": "Fill stat values",
     "fill_roll_exact": "Exact value",
     "cursor_pos": "Show memorized cursor position",
-    "ocr_mercenary_key": "Read Mercenary skills from the tooltip",
-    "ocr_mercenary_hint": "Hover a Mercenary Warrant and press this while the price check is open. The skills are not part of the copied item text, so they are read from the screen. Requires the OCR files.",
     "extra_delay": "Extra time to prevent spurious Rate limiting",
     "warn_expensive": "Settings below are a compromise between increasing load on PoE website and convenient price checking / more accurate search.",
     "accurate_collapsed": "Show indication on collapsed listings",

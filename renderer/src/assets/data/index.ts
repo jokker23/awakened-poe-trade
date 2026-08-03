@@ -7,14 +7,6 @@ export let ITEM_DROP: DropEntry[]
 export let CLIENT_STRINGS: TranslationDict
 export let CLIENT_STRINGS_REF: TranslationDict
 export let APP_PATRONS: Array<{ from: string, months: number, style: number }>
-export let MERCENARY_SKILLS: MercenarySkillEntry[] = []
-
-export interface MercenarySkillEntry {
-  id: string
-  name: string
-  kind: 'skill' | 'support'
-  tier?: number
-}
 
 export let ITEM_BY_TRANSLATED: (ns: BaseType['namespace'], name: string) => BaseType[] | undefined = () => undefined
 export let ITEM_BY_REF: (ns: BaseType['namespace'], name: string) => BaseType[] | undefined = () => undefined
@@ -202,7 +194,6 @@ export async function init (lang: string) {
   CLIENT_STRINGS_REF = (await import(/* @vite-ignore */`${import.meta.env.BASE_URL}data/en/client_strings.js`)).default
   ITEM_DROP = await (await fetch(`${import.meta.env.BASE_URL}data/item-drop.json`)).json()
   APP_PATRONS = await (await fetch(`${import.meta.env.BASE_URL}data/patrons.json`)).json()
-  MERCENARY_SKILLS = await (await fetch(`${import.meta.env.BASE_URL}data/mercenary-skills.json`)).json()
   const disenchantingNdjson = await (await fetch(`${import.meta.env.BASE_URL}data/disenchanting.ndjson`)).text()
   DISENCHANT_UNIQUE_ITEMS_ITERATOR = ndjsonFindLines<DisenchantUniqueItem>(disenchantingNdjson)
 

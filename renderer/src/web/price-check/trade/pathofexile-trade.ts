@@ -296,16 +296,6 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[]) {
     query.name = nameToQuery(activeSearch.name, filters)
   }
 
-  if (filters.mercenarySkills) {
-    const active = filters.mercenarySkills.value.filter(skill => !skill.disabled)
-    if (active.length) {
-      query.stats.push({
-        type: 'and',
-        filters: active.map(skill => ({ id: skill.id }))
-      })
-    }
-  }
-
   if (activeSearch.baseTypeTrade) {
     query.type = nameToQuery(activeSearch.baseTypeTrade, filters)
   } else if (activeSearch.baseType) {

@@ -33,7 +33,6 @@ export interface ParsedItem {
   weaponPHYSICAL?: number
   weaponELEMENTAL?: number
   mapBlighted?: 'Blighted' | 'Blight-ravaged'
-  mercenarySkills?: string[]
   mapCompletionReward?: string
   map?: {
     tier: number | undefined
